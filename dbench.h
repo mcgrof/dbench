@@ -159,6 +159,7 @@ struct options {
 	const char *iscsi_device;
 	const char *iscsi_initiatorname;
 	int machine_readable;
+	int show_execute_time;
 	const char *smb_share;
 	const char *smb_user;
 };

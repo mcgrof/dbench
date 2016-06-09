@@ -50,6 +50,7 @@ struct options options = {
 	.trunc_io            = 0,
 	.iscsi_initiatorname = "iqn.2011-09.org.samba.dbench:client",
 	.machine_readable    = 0,
+	.show_execute_time   = 0,
 };
 
 static struct timeval tv_start;
@@ -433,6 +434,8 @@ static void process_opts(int argc, const char **argv)
 		  "How many seconds of warmup to run", NULL },
 		{ "machine-readable", 0, POPT_ARG_NONE, &options.machine_readable, 0,
 		  "Print data in more machine-readable friendly format", NULL},
+		{ "show-execute-time", 0, POPT_ARG_NONE, &options.show_execute_time, 0,
+		  "Print time to execute passed workload", NULL},
 #ifdef HAVE_LIBSMBCLIENT
 		{ "smb-share",  0, POPT_ARG_STRING, &options.smb_share, 0, 
 		  "//SERVER/SHARE to use", NULL },

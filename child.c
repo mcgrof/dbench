@@ -326,6 +326,7 @@ void child_run(struct child_struct *child0, const char *loadfile)
 	int have_random = 0;
 	unsigned loop_count = 0;
 	z_off_t loop_start = 0;
+	struct timeval start;
 
 	gzf = gzopen(loadfile, "r");
 	if (gzf == NULL) {
@@ -348,6 +349,8 @@ again:
 	for (child=child0;child<child0+options.clients_per_process;child++) {
 		nb_time_reset(child);
 	}
+
+	gettimeofday(&start, NULL);
 
 	while (gzgets(gzf, line, sizeof(line)-1)) {
 		unsigned repeat_count = 1;
@@ -526,6 +529,21 @@ loop_again:
 			while (child_repeat_count--) {
 				child_op(child, params[0], fname, fname2, params+pcount, status);
 			}
+		}
+	}
+
+	if (options.show_execute_time) {
+		struct timeval end;
+		unsigned int duration;
+
+		gettimeofday(&end, NULL);
+		duration = (end.tv_sec - start.tv_sec) * 1000 +
+			   (end.tv_usec - start.tv_usec) / 1000;
+		if (options.machine_readable)
+			printf("@E@%d@%u\n", child0->id, duration);
+		else {
+			printf("%4d completed in %u ms\n", child0->id,
+			       duration);
 		}
 	}
 
