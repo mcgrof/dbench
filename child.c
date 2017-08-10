@@ -309,9 +309,19 @@ finished:
 	return 0;
 }
 
+void dump_samples(int id, unsigned int *duration, unsigned int *runtime, unsigned int nr_samples)
+{
+	unsigned int i;
+
+	for (i = 0; i < nr_samples; i++) {
+		printf("%4d completed in %u ms at time %u ms\n", id,
+		       duration[i], runtime[i]);
+	}
+}
 
 /* run a test that simulates an approximate netbench client load */
 #define MAX_PARM_LEN 1024
+#define MAX_SAMPLES 130672
 void child_run(struct child_struct *child0, const char *loadfile)
 {
 	int i;
@@ -326,7 +336,16 @@ void child_run(struct child_struct *child0, const char *loadfile)
 	int have_random = 0;
 	unsigned loop_count = 0;
 	z_off_t loop_start = 0;
-	struct timeval start;
+	struct timeval start, begin;
+	unsigned nr_samples = 0;
+
+	unsigned int *sample_duration = malloc(sizeof(unsigned int) * (MAX_SAMPLES + 1));
+	unsigned int *sample_runtime  = malloc(sizeof(unsigned int) * (MAX_SAMPLES + 1));
+
+	if (!sample_duration || !sample_runtime) {
+		printf("ENOMEM for samples\n");
+		exit(1);
+	}
 
 	gzf = gzopen(loadfile, "r");
 	if (gzf == NULL) {
@@ -344,6 +363,8 @@ void child_run(struct child_struct *child0, const char *loadfile)
 		sparams[i] = malloc(MAX_PARM_LEN);
 		memset(sparams[i], 0, MAX_PARM_LEN);
 	}
+
+	gettimeofday(&begin, NULL);
 
 again:
 	for (child=child0;child<child0+options.clients_per_process;child++) {
@@ -534,16 +555,23 @@ loop_again:
 
 	if (options.show_execute_time) {
 		struct timeval end;
-		unsigned int duration;
+		unsigned int duration, runtime;
 
 		gettimeofday(&end, NULL);
 		duration = (end.tv_sec - start.tv_sec) * 1000 +
 			   (end.tv_usec - start.tv_usec) / 1000;
+		runtime = (end.tv_sec - begin.tv_sec) * 1000 +
+			   (end.tv_usec - begin.tv_usec) / 1000;
 		if (options.machine_readable)
 			printf("@E@%d@%u\n", child0->id, duration);
 		else {
-			printf("%4d completed in %u ms\n", child0->id,
-			       duration);
+			sample_duration[nr_samples] = duration;
+			sample_runtime[nr_samples] = runtime;
+			nr_samples++;
+			if (nr_samples == MAX_SAMPLES) {
+				dump_samples(child0->id, sample_duration, sample_runtime, nr_samples);
+				nr_samples = 0;
+			}
 		}
 	}
 
@@ -556,6 +584,8 @@ loop_again:
 
 done:
 	gzclose(gzf);
+	usleep(child0->id * 5000);
+	dump_samples(child0->id, sample_duration, sample_runtime, nr_samples);
 	for (child=child0;child<child0+options.clients_per_process;child++) {
 		child->cleanup = 1;
 		fflush(stdout);
