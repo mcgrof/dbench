@@ -371,6 +371,10 @@ again:
 		nb_time_reset(child);
 	}
 
+	if (getppid() != parent) {
+		exit(1);
+	}
+
 	gettimeofday(&start, NULL);
 
 	while (gzgets(gzf, line, sizeof(line)-1)) {
@@ -383,10 +387,6 @@ again:
 
 
 		params = sparams;
-
-		if (kill(parent, 0) == -1) {
-			exit(1);
-		}
 
 loop_again:
 		/* if this is a "LOOP <xxx>" line, 
