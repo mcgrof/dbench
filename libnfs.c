@@ -21,6 +21,7 @@
 #include "mount.h"
 #include "nfs.h"
 #include "libnfs.h"
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
