@@ -17,6 +17,7 @@
    along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 #define _FILE_OFFSET_BITS 64
+#include <thread_db.h>
 #include "mount.h"
 #include "nfs.h"
 #include "libnfs.h"
