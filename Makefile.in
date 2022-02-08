@@ -15,6 +15,8 @@ LIBS=@LIBS@ -lpopt -lz @LIBSMBCLIENT@ @LIBISCSI@
 DESTDIR=/
 CC=@CC@
 CFLAGS=@CFLAGS@ -I. -DVERSION=\"$(VERSION)\" -DDATADIR=\"$(datadir)\"
+CFLAGS+=`pkg-config --cflags libtirpc`
+LIBS+=`pkg-config --libs libtirpc`
 EXEEXT=@EXEEXT@
 
 LIBNFS_OBJ = libnfs.o mount_client.o nfs_client.o mount_xdr.o nfs_xdr.o
@@ -40,11 +42,11 @@ libnfs.a: $(LIBNFS_OBJ)
 
 nfsio.o: nfsio.c mount.h nfs.h
 	@echo Compiling $@
-	gcc -g -c nfsio.c -o $@
+	gcc -g $(CFLAGS) -c nfsio.c -o $@
 
 libnfs.o: libnfs.c libnfs.h mount.h nfs.h
 	@echo Compiling $@
-	gcc -g -c libnfs.c -o $@
+	gcc -g $(CFLAGS) -c libnfs.c -o $@
 
 mount.h: mount.x
 	@echo Generating $@
@@ -56,7 +58,7 @@ nfs.h: nfs.x
 
 mount_xdr.o: mount_xdr.c mount.h
 	@echo Compiling $@
-	gcc -g -c mount_xdr.c -o $@
+	gcc -g $(CFLAGS) -c mount_xdr.c -o $@
 
 mount_xdr.c: mount.x
 	@echo Generating $@
@@ -64,7 +66,7 @@ mount_xdr.c: mount.x
 
 mount_client.o: mount_client.c mount.h
 	@echo Compiling $@
-	gcc -g -c mount_client.c -o $@
+	gcc -g $(CFLAGS) -c mount_client.c -o $@
 
 mount_client.c: mount.x
 	@echo Generating $@
@@ -72,7 +74,7 @@ mount_client.c: mount.x
 
 nfs_xdr.o: nfs_xdr.c nfs.h
 	@echo Compiling $@
-	gcc -g -c nfs_xdr.c -o $@
+	gcc $(CFLAGS) -g -c nfs_xdr.c -o $@
 
 nfs_xdr.c: nfs.x
 	@echo Generating $@
@@ -80,7 +82,7 @@ nfs_xdr.c: nfs.x
 
 nfs_client.o: nfs_client.c nfs.h
 	@echo Compiling $@
-	gcc -g -c nfs_client.c -o $@
+	gcc -g $(CFLAGS) -c nfs_client.c -o $@
 
 nfs_client.c: nfs.x
 	@echo Generating $@
