@@ -25,6 +25,7 @@
 #include "dbench.h"
 #include "popt.h"
 #include <sys/sem.h>
+#include <stdbool.h>
 #include <zlib.h>
 
 struct options options = {
@@ -60,18 +61,25 @@ static double throughput;
 struct nb_operations *nb_ops;
 int global_random;
 
-static gzFile *open_loadfile(void)
+/*
+ * Note that if the file is not in the gzip format, gzopen and gzread will not
+ * produce an error but just read it without doing any uncompressing.
+ */
+static bool check_loadfile_ok(void)
 {
-	gzFile		*f;
+	gzFile f;
 
-	if ((f = gzopen(options.loadfile, "rt")) != NULL)
-		return f;
+	f = gzopen(options.loadfile, "rt");
+	if (f) {
+		gzclose(f);
+		return true;
+	}
 
 	fprintf(stderr,
 		"dbench: error opening '%s': %s\n", options.loadfile,
 		strerror(errno));
 
-	return NULL;
+	return false;
 }
 
 
@@ -253,14 +261,11 @@ static void create_procs(int nprocs, void (*fn)(struct child_struct *, const cha
 	int i, status;
 	int synccount;
 	struct timeval tv;
-	gzFile *load;
 	struct sembuf sbuf;
 	double t;
 
-	load = open_loadfile();
-	if (load == NULL) {
+	if (!check_loadfile_ok())
 		exit(1);
-	}
 
 	if (nprocs < 1) {
 		fprintf(stderr,
