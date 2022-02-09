@@ -1,11 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT()
-AC_PREREQ(2.52)
+AC_INIT
+AC_PREREQ([2.71])
 
 AC_MSG_NOTICE([Configuring dbench])
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -24,7 +24,20 @@ else
 fi
 
 AC_HEADER_DIRENT
-AC_HEADER_TIME
+m4_warn([obsolete],
+[Update your code to rely only on HAVE_SYS_TIME_H,
+then remove this warning and the obsolete code below it.
+All current systems provide time.h; it need not be checked for.
+Not all systems provide sys/time.h, but those that do, all allow
+you to include it and time.h simultaneously.])dnl
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+# Obsolete code to be removed.
+if test $ac_cv_header_sys_time_h = yes; then
+  AC_DEFINE([TIME_WITH_SYS_TIME],[1],[Define to 1 if you can safely include both <sys/time.h>
+	     and <time.h>.  This macro is obsolete.])
+fi
+# End of obsolete code.
+
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_HEADERS(ctype.h strings.h stdlib.h string.h sys/vfs.h sys/statvfs.h stdint.h)
@@ -58,18 +71,16 @@ if test x"$ac_cv_func_fgetxattr" = x"yes" -o \
 fi
 
 AC_CACHE_CHECK([for va_copy],dbench_cv_HAVE_VA_COPY,[
-AC_TRY_LINK([#include <stdarg.h>
-va_list ap1,ap2;], [va_copy(ap1,ap2);],
-dbench_cv_HAVE_VA_COPY=yes,dbench_cv_HAVE_VA_COPY=no)])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdarg.h>
+va_list ap1,ap2;]], [[va_copy(ap1,ap2);]])],[dbench_cv_HAVE_VA_COPY=yes],[dbench_cv_HAVE_VA_COPY=no])])
 if test x"$dbench_cv_HAVE_VA_COPY" = x"yes"; then
     AC_DEFINE(HAVE_VA_COPY,1,[Whether va_copy() is available])
 fi
 
 if test x"$dbench_cv_HAVE_VA_COPY" != x"yes"; then
 AC_CACHE_CHECK([for __va_copy],dbench_cv_HAVE___VA_COPY,[
-AC_TRY_LINK([#include <stdarg.h>
-va_list ap1,ap2;], [__va_copy(ap1,ap2);],
-dbench_cv_HAVE___VA_COPY=yes,dbench_cv_HAVE___VA_COPY=no)])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdarg.h>
+va_list ap1,ap2;]], [[__va_copy(ap1,ap2);]])],[dbench_cv_HAVE___VA_COPY=yes],[dbench_cv_HAVE___VA_COPY=no])])
 if test x"$dbench_cv_HAVE___VA_COPY" = x"yes"; then
     AC_DEFINE(HAVE___VA_COPY,1,[Whether __va_copy() is available])
 fi
@@ -83,7 +94,7 @@ ac_save_CFLAGS="$CFLAGS"
 ac_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
 LIBS="$GLIB_LIBS $LIBS -lpopt"
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /*
  * Just see if we can compile/link with popt
  */
@@ -98,8 +109,7 @@ int main(int argc, const char *argv[])
 
 	return 0;
 }
-], ac_cv_have_popt=yes, ac_cv_have_popt=no,
-   [echo $ac_n "compile with POPT. Assuming OK... $ac_c"
+]])],[ac_cv_have_popt=yes],[ac_cv_have_popt=no],[echo $ac_n "compile with POPT. Assuming OK... $ac_c"
     ac_cv_have_popt=yes])
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
@@ -119,7 +129,7 @@ ac_save_CFLAGS="$CFLAGS"
 ac_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
 LIBS="$GLIB_LIBS $LIBS -lsmbclient"
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdio.h>
 #include <libsmbclient.h>
 
@@ -137,8 +147,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-], ac_cv_have_libsmbclient=yes, ac_cv_have_libsmbclient=no,
-   [echo $ac_n "compile with LIBSMBCLIENT. Assuming OK... $ac_c"
+]])],[ac_cv_have_libsmbclient=yes],[ac_cv_have_libsmbclient=no],[echo $ac_n "compile with LIBSMBCLIENT. Assuming OK... $ac_c"
     ac_cv_have_libsmbclient=yes])
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
@@ -162,7 +171,7 @@ ac_save_CFLAGS="$CFLAGS"
 ac_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
 LIBS="$GLIB_LIBS $LIBS -liscsi"
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdio.h>
 #include <iscsi/iscsi.h>
 
@@ -180,8 +189,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-], ac_cv_have_libiscsi=yes, ac_cv_have_libiscsi=no,
-   [echo $ac_n "compile with LIBISCSI. Assuming OK... $ac_c"
+]])],[ac_cv_have_libiscsi=yes],[ac_cv_have_libiscsi=no],[echo $ac_n "compile with LIBISCSI. Assuming OK... $ac_c"
     ac_cv_have_libiscsi=yes])
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
@@ -203,7 +211,7 @@ ac_save_CFLAGS="$CFLAGS"
 ac_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
 LIBS="$GLIB_LIBS $LIBS"
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* We can only check that this program compiles. We cant check whether the
    actual ioctl works since opening the device and doing i/o can only be
    done by root.
@@ -229,8 +237,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-], ac_cv_linux_scsi_sg=yes, ac_cv_linux_scsi_sg=no,
-   [echo $ac_n "cross compiling; assumed OK... $ac_c"
+]])],[ac_cv_linux_scsi_sg=yes],[ac_cv_linux_scsi_sg=no],[echo $ac_n "cross compiling; assumed OK... $ac_c"
     ac_cv_linux_scsi_sg=yes])
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
