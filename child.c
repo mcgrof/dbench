@@ -251,13 +251,17 @@ static int parse_randomstring(char *line)
 	char *pstart, *pend, rndc[2];
 	unsigned int idx;
 	char str[256];
+	size_t min_len;
 
 again:
 	pstart = index(line, '[');
 	if (pstart == NULL) {
 		goto finished;
 	}
-	strncpy(str, pstart, sizeof(str));
+
+	/* Truncate or use the smaller size passed */
+	min_len = strlen(line) < sizeof(str) ? strlen(line) : sizeof(str);
+	strncpy(str, pstart, min_len);
 
 	pend = index(str, ']');
 	if (pstart == NULL) {
