@@ -16,10 +16,6 @@
 */
 #include "dbench.h"
 
-#define _GNU_SOURCE
-#include <stdio.h>
-#undef _GNU_SOURCE
-
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <scsi/sg.h>
