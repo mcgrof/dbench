@@ -17,10 +17,11 @@
    along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 #define _FILE_OFFSET_BITS 64
-#include <thread_db.h>
+#include "dbench.h"
 #include "mount.h"
 #include "nfs.h"
 #include "libnfs.h"
+#include <thread_db.h>
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -123,8 +124,7 @@ static data_t *recursive_lookup_fhandle(struct nfsio *nfsio, const char *name)
 	if (t != NULL) {
 		return &t->fh;
 	}
-
-	return ;
+	return NULL;
 }
 
 static data_t *lookup_fhandle(struct nfsio *nfsio, const char *name, off_t *off)
@@ -392,7 +392,6 @@ struct nfsio *nfsio_connect(const char *server, const char *export, const char *
 	mountres3 *mountres;
 	fhandle3 *fh;
         struct sockaddr_in sin;
-	int ret;
 
 	nfsio = malloc(sizeof(struct nfsio));
 	if (nfsio == NULL) {
