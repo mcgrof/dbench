@@ -51,7 +51,6 @@ static void nfs3_cleanup(struct child_struct *child)
 
 static void nfs3_setup(struct child_struct *child)
 {
-	const char *status = "0x00000000";
 	nfsstat3 res;
 
 	child->rate.last_time = timeval_current();
