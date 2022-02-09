@@ -113,7 +113,7 @@ fi
 AC_MSG_CHECKING(whether libsmbclient is available)
 ac_save_CFLAGS="$CFLAGS"
 ac_save_LIBS="$LIBS"
-CFLAGS="$CFLAGS $GLIB_CFLAGS"
+CFLAGS="$CFLAGS $GLIB_CFLAGS $(pkg-config --cflags smbclient)"
 LIBS="$GLIB_LIBS $LIBS -lsmbclient"
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdio.h>
