@@ -17,8 +17,8 @@
 
 #define _FILE_OFFSET_BITS 64
 
-#include "nfs.h"
 #include "dbench.h"
+#include "nfs.h"
 
 #include <stdio.h>
 #include "mount.h"
