@@ -441,7 +441,7 @@ loop_again:
 			int count = RWBUFSIZE;
 			
 			while (count > 0) {
-			      int len;
+			      unsigned int len;
 
 			      len = count;
 			      if (len > strlen(line +13)) {
