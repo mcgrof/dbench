@@ -250,6 +250,7 @@ static int parse_randomstring(char *line)
 	int num;
 	char *pstart, *pend, rndc[2];
 	unsigned int idx;
+	char str_orig[256];
 	char str[256];
 	size_t min_len;
 
@@ -262,6 +263,7 @@ again:
 	/* Truncate or use the smaller size passed */
 	min_len = strlen(line) < sizeof(str) ? strlen(line) : sizeof(str);
 	strncpy(str, pstart, min_len);
+	strncpy(str_orig, pstart, min_len);
 
 	pend = index(str, ']');
 	if (pstart == NULL) {
@@ -288,7 +290,7 @@ finished:
 	}
 	/* remote initial " */
 	while (str[0] == '"') {
-		memcpy(str, str+1, sizeof(str)-1);
+		memcpy(str, str_orig+1, sizeof(str_orig)-1);
 	}
 	/* remote trailing " */
 	while (1) {
