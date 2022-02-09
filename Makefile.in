@@ -16,6 +16,8 @@ DESTDIR=/
 CC=@CC@
 CFLAGS=@CFLAGS@ -I. -DVERSION=\"$(VERSION)\" -DDATADIR=\"$(datadir)\"
 CFLAGS+=`pkg-config --cflags libtirpc`
+# Allows comments to be used for fallthrough
+CFLAGS+=-Wimplicit-fallthrough=2
 CFLAGS_RPCGEN=-Wno-unused-variable
 LIBS+=`pkg-config --libs libtirpc`
 EXEEXT=@EXEEXT@
@@ -28,7 +30,7 @@ SRV_OBJS = util.o tbench_srv.o socklib.o
 all: dbench doc
 
 dbench: $(DB_OBJS)
-	$(CC) -o $@ $(DB_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(DB_OBJS) $(LIBS)
 
 tbench_srv: $(SRV_OBJS)
 	$(CC) -o $@ $(SRV_OBJS) $(LIBS)
