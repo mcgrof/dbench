@@ -329,7 +329,7 @@ void child_run(struct child_struct *child0, const char *loadfile)
 	char **sparams, **params;
 	char *p;
 	const char *status;
-	gzFile *gzf;
+	gzFile gzf;
 	pid_t parent = getppid();
 	double targett;
 	struct child_struct *child;
@@ -348,7 +348,7 @@ void child_run(struct child_struct *child0, const char *loadfile)
 	}
 
 	gzf = gzopen(loadfile, "r");
-	if (gzf == NULL) {
+	if (!gzf) {
 		perror(loadfile);
 		exit(1);
 	}
