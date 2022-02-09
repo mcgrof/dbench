@@ -21,6 +21,8 @@ CFLAGS+=`pkg-config --cflags libtirpc`
 CFLAGS+=-Wimplicit-fallthrough=2
 CFLAGS_RPCGEN=-Wno-unused-variable
 CFLAGS_RPCGEN+=-Wno-cast-function-type
+SMBCFLAGS=-Wno-deprecated-declarations
+SMBCFLAGS+=`pkg-config --cflags smbclient`
 LIBS+=`pkg-config --libs libtirpc`
 EXEEXT=@EXEEXT@
 
@@ -67,6 +69,10 @@ nfsio.o: nfsio.c mount.h nfs.h
 libnfs.o: libnfs.c libnfs.h mount.h nfs.h
 	$(NQ) '   CC    ' $@
 	$(Q)gcc -g $(CFLAGS) -c libnfs.c -o $@
+
+smb.o: smb.c dbench.h
+	$(NQ) '   CC    ' $@
+	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(SMBCFLAGS) -o $@ $<
 
 mount.h: mount.x
 	$(NQ) ' RPCGEN  ' $@
