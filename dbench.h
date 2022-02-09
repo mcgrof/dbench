@@ -102,7 +102,8 @@
 #define BOOL int
 #define True 1
 #define False 0
-#define uint32 unsigned
+
+#include <bits/types.h>
 
 struct op {
 	unsigned count;
