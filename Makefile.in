@@ -19,6 +19,7 @@ CFLAGS+=`pkg-config --cflags libtirpc`
 # Allows comments to be used for fallthrough
 CFLAGS+=-Wimplicit-fallthrough=2
 CFLAGS_RPCGEN=-Wno-unused-variable
+CFLAGS_RPCGEN+=-Wno-cast-function-type
 LIBS+=`pkg-config --libs libtirpc`
 EXEEXT=@EXEEXT@
 
